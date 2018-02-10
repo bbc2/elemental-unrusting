@@ -33,11 +33,25 @@ fn pick_challenge() -> Challenge {
     }
 }
 
+fn try_read_user_answer() -> Result<u32, String> {
+    let input = read_line()?;
+    let answer = parse_number(String::from(input.trim()))?;
+    Ok(answer)
+}
+
+fn read_user_answer() -> u32 {
+    match try_read_user_answer() {
+        Err(error) => {
+            println!("Error: {}", error);
+            read_user_answer()
+        }
+        Ok(answer) => answer,
+    }
+}
+
 fn ask_challenge(challenge: Challenge) -> Result<(), String> {
     println!("Atomic number for {}?", challenge.question);
-    let input = read_line()?;
-    let user_answer = parse_number(String::from(input.trim()))?;
-    match check::check_guess(challenge.answer, user_answer) {
+    match check::check_guess(challenge.answer, read_user_answer()) {
         check::Check::Correct => println!("Good answer!"),
         check::Check::Incorrect => println!("Bad answer!"),
     };
