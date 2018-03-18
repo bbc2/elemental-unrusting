@@ -29,7 +29,12 @@ fn read_user_line() -> Result<String, String> {
 }
 
 fn main_result() -> Result<(), String> {
-    let mut state = game::initial(list![2, 21, 42]);
+    let challenges = list![
+        game::challenge::Challenge{question: String::from("He"), answer: 2},
+        game::challenge::Challenge{question: String::from("Sc"), answer: 21},
+        game::challenge::Challenge{question: String::from("Mo"), answer: 42}
+    ];
+    let mut state = game::initial(challenges);
     println!("Welcome to the game");
     while !game::end(state.clone()) {
         println!("{}", game::prompt(state.clone()));

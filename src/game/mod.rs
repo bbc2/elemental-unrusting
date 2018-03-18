@@ -1,38 +1,29 @@
 extern crate im;
 
 mod check;
+pub mod challenge;
 use self::im::*;
 
 #[derive(Clone, Debug, PartialEq)]
 pub enum State {
-    Challenge(list::List<u32>),
+    InChallenge(list::List<challenge::Challenge>),
 }
 
-pub fn initial(questions: list::List<u32>) -> State {
-    State::Challenge(questions)
-}
-
-fn atomic_to_symbol(atomic: u32) -> String {
-    if atomic == 1 {
-        String::from("H")
-    } else if atomic == 2 {
-        String::from("He")
-    } else {
-        format!("Atomic<{}>", atomic)
-    }
+pub fn initial(challenges: list::List<challenge::Challenge>) -> State {
+    State::InChallenge(challenges)
 }
 
 pub fn prompt(state: State) -> String {
     match state {
-        State::Challenge(questions) => {
-            match questions.uncons() {
+        State::InChallenge(challenges) => {
+            match challenges.uncons() {
                 None => {
                     unreachable!();
                 },
-                Some((question, _)) => {
+                Some((challenge, _)) => {
                     format!(
                         "Atomic number for {}?",
-                        atomic_to_symbol(*question),
+                        challenge.question
                     )
                 },
             }
@@ -42,7 +33,7 @@ pub fn prompt(state: State) -> String {
 
 pub fn end(state: State) -> bool {
     match state {
-        State::Challenge(questions) => {
+        State::InChallenge(questions) => {
             questions.is_empty()
         },
     }
@@ -57,27 +48,27 @@ fn parse_number(input: String) -> Result<u32, String> {
 
 pub fn next(state: State, input: String) -> (State, String) {
     match state {
-        State::Challenge(questions) =>
+        State::InChallenge(challenges) =>
             match parse_number(input) {
                 Ok(guess) => {
-                    match questions.uncons() {
+                    match challenges.uncons() {
                         None => {
                             unreachable!();
                         },
-                        Some((question, remaining)) => {
-                            match check::check_guess(*question, guess) {
+                        Some((challenge, remaining)) => {
+                            match check::check_guess(challenge.answer, guess) {
                                 check::Check::Correct => {
-                                    (State::Challenge(remaining), String::from("Good answer!"))
+                                    (State::InChallenge(remaining), String::from("Good answer!"))
                                 },
                                 check::Check::Incorrect => {
-                                    (State::Challenge(questions), String::from("Bad answer!"))
+                                    (State::InChallenge(challenges), String::from("Bad answer!"))
                                 },
                             }
                         },
                     }
                 },
                 Err(message) => {
-                    (State::Challenge(questions), message)
+                    (State::InChallenge(challenges), message)
                 },
             }
     }
@@ -89,41 +80,67 @@ mod tests {
 
     #[test]
     fn test_initial() {
-        let result = initial(list![1, 2]);
+        let challenges = list![
+            challenge::Challenge{question: String::from("He"), answer: 2}
+        ];
 
-        let expected = State::Challenge(list![1, 2]);
+        let result = initial(challenges.clone());
+
+        let expected = State::InChallenge(challenges);
         assert_eq!(expected, result);
     }
 
     #[test]
     fn test_prompt() {
-        let result = prompt(State::Challenge(list![1, 2]));
+        let challenges = list![
+            challenge::Challenge{question: String::from("H"), answer: 1},
+            challenge::Challenge{question: String::from("He"), answer: 2}
+        ];
+
+        let result = prompt(State::InChallenge(challenges));
 
         assert_eq!("Atomic number for H?", result);
     }
 
     #[test]
     fn test_next_challenge_good() {
-        let result = next(State::Challenge(list![1, 2]), String::from("1"));
+        let challenges = list![
+            challenge::Challenge{question: String::from("H"), answer: 1},
+            challenge::Challenge{question: String::from("He"), answer: 2}
+        ];
 
-        let expected = (State::Challenge(list![2]), String::from("Good answer!"));
+        let result = next(State::InChallenge(challenges), String::from("1"));
+
+        let remaining = list![
+            challenge::Challenge{question: String::from("He"), answer: 2}
+        ];
+        let expected = (State::InChallenge(remaining), String::from("Good answer!"));
         assert_eq!(expected, result);
     }
 
     #[test]
     fn test_next_challenge_bad() {
-        let result = next(State::Challenge(list![1, 2]), String::from("3"));
+        let challenges = list![
+            challenge::Challenge{question: String::from("H"), answer: 1},
+            challenge::Challenge{question: String::from("He"), answer: 2}
+        ];
 
-        let expected = (State::Challenge(list![1, 2]), String::from("Bad answer!"));
+        let result = next(State::InChallenge(challenges.clone()), String::from("3"));
+
+        let expected = (State::InChallenge(challenges), String::from("Bad answer!"));
         assert_eq!(expected, result);
     }
 
     #[test]
     fn test_next_challenge_invalid() {
-        let result = next(State::Challenge(list![1]), String::from(""));
+        let challenges = list![
+            challenge::Challenge{question: String::from("H"), answer: 1}
+        ];
+
+        let result = next(State::InChallenge(challenges.clone()), String::from(""));
 
         let expected = (
-            State::Challenge(list![1]),
+            State::InChallenge(challenges),
             String::from("cannot parse integer from empty string"),
         );
         assert_eq!(expected, result);
