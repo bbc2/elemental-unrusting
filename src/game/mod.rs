@@ -1,6 +1,5 @@
 extern crate im;
 
-mod check;
 pub mod challenge;
 use self::im::*;
 
@@ -56,13 +55,10 @@ pub fn next(state: State, input: String) -> (State, String) {
                             unreachable!();
                         },
                         Some((challenge, remaining)) => {
-                            match check::check_guess(challenge.answer, guess) {
-                                check::Check::Correct => {
-                                    (State::InChallenge(remaining), String::from("Good answer!"))
-                                },
-                                check::Check::Incorrect => {
-                                    (State::InChallenge(challenges), String::from("Bad answer!"))
-                                },
+                            if challenge.check(guess) {
+                                (State::InChallenge(remaining), String::from("Good answer!"))
+                            } else {
+                                (State::InChallenge(challenges), String::from("Bad answer!"))
                             }
                         },
                     }
