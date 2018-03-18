@@ -1,3 +1,6 @@
+#[macro_use]
+extern crate im;
+
 use std::io;
 use std::process;
 
@@ -26,16 +29,11 @@ fn read_user_line() -> Result<String, String> {
 }
 
 fn main_result() -> Result<(), String> {
-    let mut state = game::initial();
+    let mut state = game::initial(list![2, 21, 42]);
     println!("Welcome to the game");
-    while !game::end(state) {
-        let input =
-            if game::input(state) {
-                Some (read_user_line()?)
-            } else {
-                None
-            };
-        let (new_state, message) = game::next(state, input);
+    while !game::end(state.clone()) {
+        println!("{}", game::prompt(state.clone()));
+        let (new_state, message) = game::next(state, read_user_line()?);
         state = new_state;
         println!("{}", message);
     }
