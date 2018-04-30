@@ -5,10 +5,10 @@ use self::im::*;
 
 #[derive(Clone, Debug, PartialEq)]
 pub enum State {
-    InChallenge(list::List<challenge::Challenge>),
+    InChallenge(vector::Vector<challenge::Challenge>),
 }
 
-pub fn initial(challenges: list::List<challenge::Challenge>) -> State {
+pub fn initial(challenges: vector::Vector<challenge::Challenge>) -> State {
     State::InChallenge(challenges)
 }
 
@@ -76,7 +76,7 @@ mod tests {
 
     #[test]
     fn test_initial() {
-        let challenges = list![
+        let challenges = vector![
             challenge::Challenge{question: String::from("He"), answer: 2}
         ];
 
@@ -88,7 +88,7 @@ mod tests {
 
     #[test]
     fn test_prompt() {
-        let challenges = list![
+        let challenges = vector![
             challenge::Challenge{question: String::from("H"), answer: 1},
             challenge::Challenge{question: String::from("He"), answer: 2}
         ];
@@ -100,14 +100,14 @@ mod tests {
 
     #[test]
     fn test_next_challenge_good() {
-        let challenges = list![
+        let challenges = vector![
             challenge::Challenge{question: String::from("H"), answer: 1},
             challenge::Challenge{question: String::from("He"), answer: 2}
         ];
 
         let result = next(State::InChallenge(challenges), String::from("1"));
 
-        let remaining = list![
+        let remaining = vector![
             challenge::Challenge{question: String::from("He"), answer: 2}
         ];
         let expected = (State::InChallenge(remaining), String::from("Good answer!"));
@@ -116,7 +116,7 @@ mod tests {
 
     #[test]
     fn test_next_challenge_bad() {
-        let challenges = list![
+        let challenges = vector![
             challenge::Challenge{question: String::from("H"), answer: 1},
             challenge::Challenge{question: String::from("He"), answer: 2}
         ];
@@ -129,7 +129,7 @@ mod tests {
 
     #[test]
     fn test_next_challenge_invalid() {
-        let challenges = list![
+        let challenges = vector![
             challenge::Challenge{question: String::from("H"), answer: 1}
         ];
 
