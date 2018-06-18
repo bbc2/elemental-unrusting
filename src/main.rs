@@ -1,11 +1,17 @@
-#[macro_use]
 extern crate im;
-
-use std::io;
-use std::process;
+extern crate rand;
+#[macro_use]
+extern crate serde_derive;
 
 use std::error::Error;
+use std::io;
+use std::iter::FromIterator;
+use std::process;
 
+use im::*;
+use rand::Rng;
+
+mod elements;
 mod game;
 
 fn read_line() -> Result<String, String> {
@@ -28,12 +34,33 @@ fn read_user_line() -> Result<String, String> {
     Ok(answer)
 }
 
+fn element_to_challenge(element: elements::Element) -> game::challenge::Challenge {
+    return game::challenge::Challenge{
+        question: element.symbol,
+        answer: element.atomic_number,
+    }
+}
+
+fn random_challenges(
+    elements: Vector<elements::Element>,
+    count: u64,
+) -> Vector<game::challenge::Challenge> {
+    let mut vector = Vec::from_iter(elements.into_iter());
+    let mut rng = rand::thread_rng();
+    rng.shuffle(&mut vector);
+    vector.truncate(count as usize);
+    return Vector::from_iter(
+        vector
+            .into_iter()
+            .map(|element| {
+                return element_to_challenge((*element).clone());
+            })
+    )
+}
+
 fn main_result() -> Result<(), String> {
-    let challenges = list![
-        game::challenge::Challenge{question: String::from("He"), answer: 2},
-        game::challenge::Challenge{question: String::from("Sc"), answer: 21},
-        game::challenge::Challenge{question: String::from("Mo"), answer: 42}
-    ];
+    let elements = elements::load();
+    let challenges = random_challenges(elements, 3);
     let mut state = game::initial(challenges);
     println!("Welcome to the game");
     while !game::end(state.clone()) {

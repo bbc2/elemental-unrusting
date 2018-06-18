@@ -5,3 +5,7 @@ authors = ["Bertrand Bonnefoy-Claudet <bertrandbc@gmail.com>"]
 
 [dependencies]
 im = "*"
+rand = "*"
+serde = "*"
+serde_derive = "*"
+serde_json = "*"
