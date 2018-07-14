@@ -20,20 +20,18 @@ struct JsonElement {
 
 #[derive(Deserialize)]
 struct Json {
-    elements: Vec<JsonElement>
+    elements: Vec<JsonElement>,
 }
 
 fn json_element_to_element(json_element: JsonElement) -> Element {
     return Element {
         atomic_number: json_element.number,
         symbol: json_element.symbol,
-    }
+    };
 }
 
 fn json_to_elements(json: Json) -> Vector<Element> {
-    return Vector::from_iter(
-        json.elements.into_iter().map(json_element_to_element)
-    );
+    return Vector::from_iter(json.elements.into_iter().map(json_element_to_element));
 }
 
 pub fn load() -> Vector<Element> {

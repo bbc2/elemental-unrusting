@@ -1,11 +1,11 @@
 #[derive(Clone, Debug, PartialEq)]
 pub struct Challenge {
     pub question: String,
-    pub answer: u32,
+    pub answer: String,
 }
 
 impl Challenge {
-    pub fn check(&self, guess: u32) -> bool {
+    pub fn check(&self, guess: String) -> bool {
         self.answer == guess
     }
 }

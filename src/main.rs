@@ -29,10 +29,10 @@ fn read_user_line() -> Result<String, String> {
 }
 
 fn element_to_challenge(element: elements::Element) -> game::challenge::Challenge {
-    return game::challenge::Challenge{
+    return game::challenge::Challenge {
         question: element.symbol,
-        answer: element.atomic_number,
-    }
+        answer: format!("{}", element.atomic_number),
+    };
 }
 
 fn random_challenges(
@@ -43,13 +43,9 @@ fn random_challenges(
     let mut rng = rand::thread_rng();
     rng.shuffle(&mut vector);
     vector.truncate(count as usize);
-    return Vector::from_iter(
-        vector
-            .into_iter()
-            .map(|element| {
-                return element_to_challenge((*element).clone());
-            })
-    )
+    return Vector::from_iter(vector.into_iter().map(|element| {
+        return element_to_challenge((*element).clone());
+    }));
 }
 
 fn main_result() -> Result<(), String> {
