@@ -22,12 +22,6 @@ fn read_line() -> Result<String, String> {
     }
 }
 
-#[derive(Debug, PartialEq)]
-struct Challenge {
-    question: String,
-    answer: u32,
-}
-
 fn read_user_line() -> Result<String, String> {
     let input = read_line()?;
     let answer = String::from(input.trim());
