@@ -44,7 +44,7 @@ fn random_challenges(
     rng.shuffle(&mut vector);
     vector.truncate(count as usize);
     return Vector::from_iter(vector.into_iter().map(|element| {
-        return element_to_challenge((*element).clone());
+        return element_to_challenge(element.clone());
     }));
 }
 

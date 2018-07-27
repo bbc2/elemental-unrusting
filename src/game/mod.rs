@@ -14,11 +14,11 @@ pub fn initial(challenges: vector::Vector<challenge::Challenge>) -> State {
 
 pub fn prompt(state: State) -> String {
     match state {
-        State::InChallenge(challenges) => match challenges.uncons() {
+        State::InChallenge(challenges) => match challenges.front() {
             None => {
                 unreachable!();
             }
-            Some((challenge, _)) => format!("Atomic number for {}?", challenge.question),
+            Some(challenge) => format!("Atomic number for {}?", challenge.question),
         },
     }
 }
@@ -37,15 +37,20 @@ pub fn next(state: State, input: String) -> (State, String) {
     match state {
         State::InChallenge(challenges) => {
             let guess = normalize(input);
-            match challenges.uncons() {
+            match challenges.front() {
                 None => {
                     unreachable!();
                 }
-                Some((challenge, remaining)) => {
+                Some(challenge) => {
                     if challenge.check(guess) {
+                        let mut remaining = challenges.clone();
+                        remaining.pop_front();
                         (State::InChallenge(remaining), String::from("Good answer!"))
                     } else {
-                        (State::InChallenge(challenges), String::from("Bad answer!"))
+                        (
+                            State::InChallenge(challenges.clone()),
+                            String::from("Bad answer!"),
+                        )
                     }
                 }
             }
