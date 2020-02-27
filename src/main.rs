@@ -3,13 +3,13 @@ extern crate rand;
 #[macro_use]
 extern crate serde_derive;
 
+use rand::seq::SliceRandom;
 use std::error::Error;
 use std::io;
 use std::iter::FromIterator;
 use std::process;
 
 use im::*;
-use rand::Rng;
 
 mod elements;
 mod game;
@@ -41,7 +41,7 @@ fn random_challenges(
 ) -> Vector<game::challenge::Challenge> {
     let mut vector = Vec::from_iter(elements.into_iter());
     let mut rng = rand::thread_rng();
-    rng.shuffle(&mut vector);
+    vector.shuffle(&mut rng);
     vector.truncate(count as usize);
     return Vector::from_iter(vector.into_iter().map(|element| {
         return element_to_challenge(element.clone());
