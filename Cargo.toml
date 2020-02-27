@@ -1,7 +1,7 @@
 [package]
 name = "elemental_unrusting"
 version = "0.1.0"
-authors = ["Bertrand Bonnefoy-Claudet <bertrandbc@gmail.com>"]
+authors = ["Bertrand Bonnefoy-Claudet <bertrand@bertrandbc.com>"]
 
 [dependencies]
 im = "*"
