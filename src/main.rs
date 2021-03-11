@@ -4,7 +4,6 @@ extern crate rand;
 extern crate serde_derive;
 
 use rand::seq::SliceRandom;
-use std::error::Error;
 use std::io;
 use std::iter::FromIterator;
 use std::process;
@@ -17,7 +16,7 @@ mod game;
 fn read_line() -> Result<String, String> {
     let mut input = String::new();
     match io::stdin().read_line(&mut input) {
-        Err(error) => Err(format!("{}", error.description())),
+        Err(error) => Err(format!("{}", error)),
         Ok(_) => Ok(input),
     }
 }
