@@ -12,7 +12,7 @@ pub fn initial(challenges: vector::Vector<challenge::Challenge>) -> State {
     State::InChallenge(challenges)
 }
 
-pub fn prompt(state: State) -> String {
+pub fn prompt(state: &State) -> String {
     match state {
         State::InChallenge(challenges) => match challenges.front() {
             None => {
@@ -23,7 +23,7 @@ pub fn prompt(state: State) -> String {
     }
 }
 
-pub fn end(state: State) -> bool {
+pub fn end(state: &State) -> bool {
     match state {
         State::InChallenge(questions) => questions.is_empty(),
     }
@@ -33,7 +33,7 @@ fn normalize(input: String) -> String {
     return String::from(input.trim());
 }
 
-pub fn next(state: State, input: String) -> (State, String) {
+pub fn next(state: &State, input: String) -> (State, String) {
     match state {
         State::InChallenge(challenges) => {
             let guess = normalize(input);
@@ -88,7 +88,7 @@ mod tests {
             }
         ];
 
-        let result = prompt(State::InChallenge(challenges));
+        let result = prompt(&State::InChallenge(challenges));
 
         assert_eq!("Atomic number for H?", result);
     }
@@ -107,7 +107,7 @@ mod tests {
         ];
 
         let result = next(
-            State::InChallenge(challenges),
+            &State::InChallenge(challenges),
             String::from(String::from("1")),
         );
 
@@ -132,7 +132,7 @@ mod tests {
             }
         ];
 
-        let result = next(State::InChallenge(challenges.clone()), String::from("3"));
+        let result = next(&State::InChallenge(challenges.clone()), String::from("3"));
 
         let expected = (State::InChallenge(challenges), String::from("Bad answer!"));
         assert_eq!(expected, result);

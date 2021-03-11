@@ -52,9 +52,9 @@ fn main_result() -> Result<(), String> {
     let challenges = random_challenges(elements, 3);
     let mut state = game::initial(challenges);
     println!("Welcome to the game");
-    while !game::end(state.clone()) {
-        println!("{}", game::prompt(state.clone()));
-        let (new_state, message) = game::next(state, read_user_line()?);
+    while !game::end(&state) {
+        println!("{}", game::prompt(&state));
+        let (new_state, message) = game::next(&state, read_user_line()?);
         state = new_state;
         println!("{}", message);
     }
