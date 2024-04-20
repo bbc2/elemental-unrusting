@@ -108,7 +108,7 @@ mod tests {
 
         let result = next(
             &State::InChallenge(challenges),
-            String::from(String::from("1")),
+            String::from("1"),
         );
 
         let remaining = vector![challenge::Challenge {

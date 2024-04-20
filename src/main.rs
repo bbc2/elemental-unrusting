@@ -28,23 +28,23 @@ fn read_user_line() -> Result<String, String> {
 }
 
 fn element_to_challenge(element: elements::Element) -> game::challenge::Challenge {
-    return game::challenge::Challenge {
+    game::challenge::Challenge {
         question: element.symbol,
         answer: format!("{}", element.atomic_number),
-    };
+    }
 }
 
 fn random_challenges(
     elements: Vector<elements::Element>,
     count: u64,
 ) -> Vector<game::challenge::Challenge> {
-    let mut vector = Vec::from_iter(elements.into_iter());
+    let mut vector = Vec::from_iter(elements);
     let mut rng = rand::thread_rng();
     vector.shuffle(&mut rng);
     vector.truncate(count as usize);
-    return Vector::from_iter(vector.into_iter().map(|element| {
-        return element_to_challenge(element.clone());
-    }));
+    Vector::from_iter(vector.into_iter().map(|element| {
+        element_to_challenge(element.clone())
+    }))
 }
 
 fn main_result() -> Result<(), String> {
