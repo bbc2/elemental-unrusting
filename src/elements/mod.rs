@@ -4,7 +4,7 @@ extern crate serde_json;
 
 use std::iter::FromIterator;
 
-use self::im::*;
+use self::im::Vector;
 
 #[derive(Clone, Debug, PartialEq)]
 pub struct Element {

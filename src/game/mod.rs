@@ -1,7 +1,7 @@
 extern crate im;
 
 pub mod challenge;
-use self::im::*;
+use self::im::vector;
 
 #[derive(Clone, Debug, PartialEq)]
 pub enum State {
@@ -106,10 +106,7 @@ mod tests {
             }
         ];
 
-        let result = next(
-            &State::InChallenge(challenges),
-            String::from("1"),
-        );
+        let result = next(&State::InChallenge(challenges), String::from("1"));
 
         let remaining = vector![challenge::Challenge {
             question: String::from("He"),

@@ -8,7 +8,7 @@ use std::io;
 use std::iter::FromIterator;
 use std::process;
 
-use im::*;
+use im::Vector;
 
 mod elements;
 mod game;
@@ -42,9 +42,11 @@ fn random_challenges(
     let mut rng = rand::thread_rng();
     vector.shuffle(&mut rng);
     vector.truncate(count as usize);
-    Vector::from_iter(vector.into_iter().map(|element| {
-        element_to_challenge(element.clone())
-    }))
+    Vector::from_iter(
+        vector
+            .into_iter()
+            .map(|element| element_to_challenge(element.clone())),
+    )
 }
 
 fn main_result() -> Result<(), String> {
