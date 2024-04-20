@@ -1,60 +1,48 @@
-extern crate im;
-
 pub mod challenge;
-use self::im::vector;
 
-#[derive(Clone, Debug, PartialEq)]
-pub enum State {
-    InChallenge(vector::Vector<challenge::Challenge>),
-}
-
-pub fn initial(challenges: vector::Vector<challenge::Challenge>) -> State {
-    State::InChallenge(challenges)
-}
-
-pub fn prompt(state: &State) -> String {
-    match state {
-        State::InChallenge(challenges) => match challenges.front() {
-            None => {
-                unreachable!();
-            }
-            Some(challenge) => format!("Atomic number for {}?", challenge.question),
-        },
-    }
-}
-
-pub fn end(state: &State) -> bool {
-    match state {
-        State::InChallenge(questions) => questions.is_empty(),
-    }
-}
-
-fn normalize(input: String) -> String {
+fn normalize(input: &str) -> String {
     return String::from(input.trim());
 }
 
-pub fn next(state: &State, input: String) -> (State, String) {
-    match state {
-        State::InChallenge(challenges) => {
-            let guess = normalize(input);
-            match challenges.front() {
-                None => {
-                    unreachable!();
-                }
-                Some(challenge) => {
-                    if challenge.check(guess) {
-                        let mut remaining = challenges.clone();
-                        remaining.pop_front();
-                        (State::InChallenge(remaining), String::from("Good answer!"))
-                    } else {
-                        (
-                            State::InChallenge(challenges.clone()),
-                            String::from("Bad answer!"),
-                        )
-                    }
+pub struct Game {
+    challenges: Vec<challenge::Challenge>,
+}
+
+impl Game {
+    pub fn initial(challenges: &[challenge::Challenge]) -> Self {
+        let mut challenges = challenges.to_vec();
+        challenges.reverse();
+        Self { challenges }
+    }
+
+    pub fn prompt(&self) -> String {
+        match self.challenges.last() {
+            None => {
+                unreachable!()
+            }
+            Some(challenge) => format!("Atomic number for {}?", challenge.question),
+        }
+    }
+
+    pub fn next(&mut self, input: &str) -> String {
+        let guess = normalize(input);
+        match self.challenges.last() {
+            None => {
+                unreachable!();
+            }
+            Some(challenge) => {
+                if challenge.check(guess) {
+                    self.challenges.pop();
+                    String::from("Good answer!")
+                } else {
+                    String::from("Bad answer!")
                 }
             }
         }
+    }
+
+    pub fn end(&self) -> bool {
+        self.challenges.is_empty()
     }
 }
 
@@ -63,75 +51,61 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_initial() {
-        let challenges = vector![challenge::Challenge {
-            question: String::from("He"),
-            answer: String::from("2")
-        }];
-
-        let result = initial(challenges.clone());
-
-        let expected = State::InChallenge(challenges);
-        assert_eq!(expected, result);
-    }
-
-    #[test]
     fn test_prompt() {
-        let challenges = vector![
+        let challenges = vec![
             challenge::Challenge {
                 question: String::from("H"),
-                answer: String::from("1")
+                answer: String::from("1"),
             },
             challenge::Challenge {
                 question: String::from("He"),
-                answer: String::from("2")
-            }
+                answer: String::from("2"),
+            },
         ];
+        let game = Game::initial(&challenges);
 
-        let result = prompt(&State::InChallenge(challenges));
+        let result = game.prompt();
 
         assert_eq!("Atomic number for H?", result);
     }
 
     #[test]
     fn test_next_challenge_good() {
-        let challenges = vector![
+        let challenges = vec![
             challenge::Challenge {
                 question: String::from("H"),
-                answer: String::from("1")
+                answer: String::from("1"),
             },
             challenge::Challenge {
                 question: String::from("He"),
-                answer: String::from("2")
-            }
+                answer: String::from("2"),
+            },
         ];
+        let mut game = Game::initial(&challenges);
 
-        let result = next(&State::InChallenge(challenges), String::from("1"));
+        let result = game.next("1");
 
-        let remaining = vector![challenge::Challenge {
-            question: String::from("He"),
-            answer: String::from("2")
-        }];
-        let expected = (State::InChallenge(remaining), String::from("Good answer!"));
+        let expected = String::from("Good answer!");
         assert_eq!(expected, result);
     }
 
     #[test]
     fn test_next_challenge_bad() {
-        let challenges = vector![
+        let challenges = vec![
             challenge::Challenge {
                 question: String::from("H"),
-                answer: String::from("1")
+                answer: String::from("1"),
             },
             challenge::Challenge {
                 question: String::from("He"),
-                answer: String::from("2")
-            }
+                answer: String::from("2"),
+            },
         ];
+        let mut game = Game::initial(&challenges);
 
-        let result = next(&State::InChallenge(challenges.clone()), String::from("3"));
+        let result = game.next("3");
 
-        let expected = (State::InChallenge(challenges), String::from("Bad answer!"));
+        let expected = String::from("Bad answer!");
         assert_eq!(expected, result);
     }
 }

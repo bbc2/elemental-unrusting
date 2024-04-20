@@ -1,4 +1,3 @@
-extern crate im;
 extern crate rand;
 #[macro_use]
 extern crate serde_derive;
@@ -7,8 +6,6 @@ use rand::seq::SliceRandom;
 use std::io;
 use std::iter::FromIterator;
 use std::process;
-
-use im::Vector;
 
 mod elements;
 mod game;
@@ -35,14 +32,14 @@ fn element_to_challenge(element: elements::Element) -> game::challenge::Challeng
 }
 
 fn random_challenges(
-    elements: Vector<elements::Element>,
+    elements: Vec<elements::Element>,
     count: u64,
-) -> Vector<game::challenge::Challenge> {
+) -> Vec<game::challenge::Challenge> {
     let mut vector = Vec::from_iter(elements);
     let mut rng = rand::thread_rng();
     vector.shuffle(&mut rng);
     vector.truncate(count as usize);
-    Vector::from_iter(
+    Vec::from_iter(
         vector
             .into_iter()
             .map(|element| element_to_challenge(element.clone())),
@@ -52,23 +49,19 @@ fn random_challenges(
 fn main_result() -> Result<(), String> {
     let elements = elements::load();
     let challenges = random_challenges(elements, 3);
-    let mut state = game::initial(challenges);
+    let mut game = game::Game::initial(&challenges);
     println!("Welcome to the game");
-    while !game::end(&state) {
-        println!("{}", game::prompt(&state));
-        let (new_state, message) = game::next(&state, read_user_line()?);
-        state = new_state;
+    while !game.end() {
+        println!("{}", game.prompt());
+        let message = game.next(&read_user_line()?);
         println!("{}", message);
     }
     Ok(())
 }
 
 fn main() {
-    match main_result() {
-        Err(error) => {
-            println!("Error: {}", error);
-            process::exit(1);
-        }
-        Ok(()) => {}
+    if let Err(error) = main_result() {
+        println!("Error: {}", error);
+        process::exit(1);
     }
 }

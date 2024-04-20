@@ -1,10 +1,7 @@
-extern crate im;
 extern crate serde;
 extern crate serde_json;
 
 use std::iter::FromIterator;
-
-use self::im::Vector;
 
 #[derive(Clone, Debug, PartialEq)]
 pub struct Element {
@@ -30,11 +27,11 @@ fn json_element_to_element(json_element: JsonElement) -> Element {
     }
 }
 
-fn json_to_elements(json: Json) -> Vector<Element> {
-    Vector::from_iter(json.elements.into_iter().map(json_element_to_element))
+fn json_to_elements(json: Json) -> Vec<Element> {
+    Vec::from_iter(json.elements.into_iter().map(json_element_to_element))
 }
 
-pub fn load() -> Vector<Element> {
+pub fn load() -> Vec<Element> {
     let string = String::from(include_str!("periodic_table.json"));
     let json_elements = serde_json::from_str(&string).unwrap();
     json_to_elements(json_elements)
