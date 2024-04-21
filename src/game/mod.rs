@@ -6,13 +6,22 @@ fn normalize(input: &str) -> String {
 
 pub struct Game {
     challenges: Vec<challenge::Challenge>,
+    failures: u64,
 }
 
 impl Game {
     pub fn initial(challenges: &[challenge::Challenge]) -> Self {
         let mut challenges = challenges.to_vec();
         challenges.reverse();
-        Self { challenges }
+        Self {
+            challenges,
+            failures: 0,
+        }
+    }
+
+    fn goto_next(&mut self) {
+        self.challenges.pop();
+        self.failures = 0;
     }
 
     pub fn prompt(&self) -> String {
@@ -32,10 +41,15 @@ impl Game {
             }
             Some(challenge) => {
                 if challenge.check(guess) {
-                    self.challenges.pop();
+                    self.goto_next();
                     String::from("Good answer!")
                 } else {
-                    String::from("Bad answer!")
+                    let result = String::from("Bad answer!");
+                    self.failures += 1;
+                    if self.failures > 2 {
+                        self.goto_next();
+                    }
+                    result
                 }
             }
         }
