@@ -1,0 +1,21 @@
+name: main
+
+on:
+  - push
+  - pull_request
+
+jobs:
+  check-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@1.77.2
+      - run: make check-tests
+  check-lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@1.77.2
+        with:
+          components: clippy, rustfmt
+      - run: make check-lint check-format
